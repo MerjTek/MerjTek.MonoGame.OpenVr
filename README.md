@@ -5,7 +5,7 @@ MerjTek.MonoGame.OpenVr is a library that works on WIndows to add OpenVR (SteamV
 
 ## ToDo List
 * Controllers
-    * Update the OVRControllerProfile to include axis information forthe touchpad, joystick, and or triggers
+    * Update the OVRControllerProfile to include axis information for the touchpad, joystick, and or triggers
     * Update the bits of each button in every profile once I obtain the correct information.
 * DirectX
     * Solve the Rendertarget2D submission errors. 
