@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Authors>MerjTek</Authors>
+    <Company>MerjTek</Company>
+    <Description>A pavkage used with a MonoGame (DirectX) project to add OpenVR (SteamVR) abilities to a project.</Description>
+    <Copyright>MerjTek © 2023</Copyright>
+    <PackageTags>MonoGame;VR</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>$(AssemblyName)</Title>
+    <IncludeSymbols>False</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/MerjTek/MerjTek.MonoGame.OpenVr</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/MerjTek/MerjTek.MonoGame.OpenVr</PackageProjectUrl>
+    <PackageReleaseNotes>1.0.0 - Initial Release</PackageReleaseNotes>
+    <FileVersion>1.0.0</FileVersion>
+    <AssemblyFileVersion>1.0.0</AssemblyFileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="OVRDevice.OpenGL.cs" />
+    <Compile Remove="Platform\OVRDevice.OpenGL.cs" />
+    <Compile Remove="Platform\VrGame.OpenGL.cs" />
+    <Compile Remove="VrGame.OpenGL.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="openvr_api.dll" CopyToOutputDirectory="Always">
+      <Pack>True</Pack>
+      <PackagePath>\lib\net6.0-windows7.0\openvr_api.dll</PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

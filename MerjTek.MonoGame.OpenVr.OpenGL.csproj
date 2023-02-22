@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Title>$(AssemblyName)</Title>
+    <PackageTags>MonoGame;VR</PackageTags>
+    <Copyright>MerjTek © 2023</Copyright>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Company>MerjTek</Company>
+    <Authors>MerjTek</Authors>
+    <Description>A pavkage used with a MonoGame (OpenGL) project to add OpenVR (SteamVR) abilities to a project.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/MerjTek/MerjTek.MonoGame.OpenVr</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MerjTek/MerjTek.MonoGame.OpenVr</RepositoryUrl>
+    <PackageReleaseNotes>1.0.0 - Initial Release</PackageReleaseNotes>
+    <FileVersion>1.0.0</FileVersion>
+    <AssemblyFileVersion>1.0.0</AssemblyFileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="OVRDevice.DirectX.cs" />
+    <Compile Remove="Platform\OVRDevice.DirectX.cs" />
+    <Compile Remove="Platform\VrGame.DirectX.cs" />
+    <Compile Remove="VrGame.DirectX.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="openvr_api.dll" CopyToOutputDirectory="Always">
+      <Pack>True</Pack>
+      <PackagePath>\lib\net6.0-windows7.0\openvr_api.dll</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
