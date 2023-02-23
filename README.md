@@ -7,12 +7,10 @@ MerjTek.MonoGame.OpenVr is a library that works on WIndows to add OpenVR (SteamV
 * Controllers
     * Update the OVRControllerProfile to include axis information for the touchpad, joystick, and or triggers
     * Update the bits of each button in every profile once I obtain the correct information.
-* DirectX
-    * Solve the Rendertarget2D submission errors. 
 
 
 ## Nuget Packages
--[ MerjTek.MonoGame.OpenVr.DirectX ] v1.0.0 - Not published   
+-[ MerjTek.MonoGame.OpenVr.DirectX ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.DirectX) v1.0.0  
 -[ MerjTek.MonoGame.OpenVr.OpenGL ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.OpenGL) v1.0.0  
 
 
@@ -24,6 +22,16 @@ __After Installing the Nuget Package:__
 	    using MerjTek.MonoGame.OpenVr;
         ...
 	
+
+        ...
+        public Game1()
+        {
+            _graphics = new GraphicsDeviceManager(this);
+
+            // DirectX must use the HiDef profile. OpenGL can use both profiles.
+            _graphics.GraphicsProfile = GraphicsProfile.HiDef; 
+        ...
+
 
         ...
         // Change the Game1 base class definiton:
@@ -43,7 +51,7 @@ __After Installing the Nuget Package:__
             // Drawing code here
             
             // NOTE: The NearPlane, FarPlane, and ViewMatrix properties must be  
-            must be set anywhere before base.Draw is called.
+            // set anywhere before base.Draw is called.
 
             base.Draw(gameTime);
             
@@ -72,10 +80,7 @@ __After Installing the Nuget Package:__
 
 ## Caveats
 
-* The DirectX library currently does not work. Nothing appears in the VR glasses. Rendering the left eye to the screen works. Why?
-
-    * Calling Submit on each eye's RenderTarget2D fails with a EVRCompositorError.SharedTexturedNotSupported error.
-    * __OpenVR documentation__: (Error) SharedTexturesNotSupported (application needs to call CreateDXGIFactory1 or later before creating DX device)
+* Make sure you are using the HiDef profile for DirectX. OpenGL can use both the Reach and the HiDef profiles.
 
 
 ## Building
