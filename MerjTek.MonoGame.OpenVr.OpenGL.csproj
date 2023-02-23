@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Company>MerjTek</Company>
     <Authors>MerjTek</Authors>
-    <Description>A pavkage used with a MonoGame (OpenGL) project to add OpenVR (SteamVR) abilities to a project.</Description>
+    <Description>A package used with a MonoGame (OpenGL) project to add OpenVR (SteamVR) abilities to a project.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

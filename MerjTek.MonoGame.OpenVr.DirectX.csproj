@@ -6,7 +6,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>MerjTek</Authors>
     <Company>MerjTek</Company>
-    <Description>A pavkage used with a MonoGame (DirectX) project to add OpenVR (SteamVR) abilities to a project.</Description>
+    <Description>A package used with a MonoGame (DirectX) project to add OpenVR (SteamVR) abilities to a project.</Description>
     <Copyright>MerjTek © 2023</Copyright>
     <PackageTags>MonoGame;VR</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
