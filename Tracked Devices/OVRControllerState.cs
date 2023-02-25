@@ -493,8 +493,8 @@ namespace MerjTek.MonoGame.OpenVr
                 Joystick_AxisX = -1, // Unused
                 Joystick_AxisY = -1, // Unused
                 TouchPad_AxisX = 0,
-                TouchPad_AxisY = 1,
-                FrontTrigger_AxisX = 2, // Unused
+                TouchPad_AxisY = 0,
+                FrontTrigger_AxisX = 1,
                 FrontTrigger_AxisY = -1, // Unused
                 SideTrigger_AxisX = -1, // Unused
                 SideTrigger_AxisY = -1, // Unused
@@ -502,15 +502,15 @@ namespace MerjTek.MonoGame.OpenVr
                 // Buttons
                 SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
                 MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
-                AButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                BButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                XButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                YButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                JoystickButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                AButtonIndex = (int)EVRButtonId.k_EButton_Max, // Unused
+                BButtonIndex = (int)EVRButtonId.k_EButton_Max, // Unused
+                XButtonIndex = (int)EVRButtonId.k_EButton_Max, // Unused
+                YButtonIndex = (int)EVRButtonId.k_EButton_Max, // Unused
+                JoystickButtonIndex = (int)EVRButtonId.k_EButton_Max, // Unused
                 SideButtonIndex = 2,
                 TriggerButtonIndex = 15,
-                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                TouchPadPressedIndex = 14,
+                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
+                TouchPadPressedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
             };
 
             #endregion
