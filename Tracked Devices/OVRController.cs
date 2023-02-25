@@ -68,7 +68,7 @@ namespace MerjTek.MonoGame.OpenVr
         public Vector3 PositionVector { get { return GetPose().Translation; } }
 
         /// <summary>
-        /// The controller's rotation matrix.
+        /// The controller's rotation matrix. (TODO)
         /// </summary>
         public Matrix RotationMatrix { get { return GetPose(); } }
 
@@ -76,6 +76,15 @@ namespace MerjTek.MonoGame.OpenVr
         /// Enables the controller to throw an exception when getting the state fails.
         /// </summary>
         public bool ThrowOnGetStateFailure { get; set; }
+
+        /// <summary>
+        /// The tracking origin of the universe.
+        /// </summary>
+        public ETrackingUniverseOrigin UniverseOrigin
+        {
+            get { return universeOrigin; }
+            set { universeOrigin = value; }
+        }
 
         #endregion
 
@@ -85,33 +94,62 @@ namespace MerjTek.MonoGame.OpenVr
         /// Initializes a new instance of the OpenVRController class.
         /// </summary>
         /// <param name="index">The index of the device.</param>
-        /// <param name="throwOnFailure">Determines if getting the controller state with throw an exception on failure.</param>
+        /// <param name="throwOnFailure">Determines if getting the controller state will throw an exception on failure.</param>
         public OVRController(int index,
                              bool throwOnFailure = false) :
             base(index)
         {
             universeOrigin = ETrackingUniverseOrigin.TrackingUniverseStanding;
-            profile = OVRControllerProfile.Default;
             OVRDevice device = OVRDevice.Get();
 
-            // Get controller handedness
-            switch (device.GetControllerRole(index))
+            #region Set the controller profile
+
+            var error = ETrackedPropertyError.TrackedProp_Success;
+
+            string manufacturer = device.GetStringTrackedDeviceProperty(
+                0,
+                Valve.VR.ETrackedDeviceProperty.Prop_ManufacturerName_String,
+                256,
+                ref error);
+
+            profile = manufacturer.ToLower() switch
             {
-                case ETrackedControllerRole.LeftHand:
-                    Handedness = ControllerHandedness.Left;
-                    break;
+                "hpP" => OVRControllerProfile.HP,
+                "htc" => OVRControllerProfile.HTC,
+                "meta" or "oculus" => OVRControllerProfile.Oculus,
+                "pico" => OVRControllerProfile.Pico,
+                "valve" => OVRControllerProfile.Valve,
+                "windowsmr" => OVRControllerProfile.WindowsMixedReality,
+                _ => OVRControllerProfile.Default,
+            };
 
-                case ETrackedControllerRole.RightHand:
-                    Handedness = ControllerHandedness.Right;
-                    break;
+            // NOTE: I may not need this yet
+            //string model = device.GetStringTrackedDeviceProperty(
+            //    0,
+            //    Valve.VR.ETrackedDeviceProperty.Prop_ModelNumber_String,
+            //    256,
+            //    ref error);
 
-                default:
-                    Handedness = ControllerHandedness.None;
-                    break;
-            }
+            #endregion
+            #region Set the controller handedness
 
-            // Create the controller state object.
-            currentState = new OVRControllerState(Index, Handedness);
+            Handedness = device.GetControllerRole(index) switch
+            {
+                ETrackedControllerRole.LeftHand => ControllerHandedness.Left,
+                ETrackedControllerRole.RightHand => ControllerHandedness.Right,
+                //ETrackedControllerRole.Invalid => ControllerHandedness.None,
+                //ETrackedControllerRole.OptOut=> ControllerHandedness.None,
+                //ETrackedControllerRole.Treadmill=> ControllerHandedness.None,
+                //ETrackedControllerRole.Stylus=> ControllerHandedness.None,
+                _ => ControllerHandedness.None,
+            };
+
+            #endregion
+            #region Create the controller state object.
+
+            currentState = new OVRControllerState(Handedness);
+
+            #endregion
 
             ThrowOnGetStateFailure = throwOnFailure;
         }
@@ -126,14 +164,14 @@ namespace MerjTek.MonoGame.OpenVr
         public void Update()
         {
             OVRDevice device = OVRDevice.Get();
-            VRControllerState_t state = new VRControllerState_t();
-            TrackedDevicePose_t trackedDevicePose = new TrackedDevicePose_t();
+            VRControllerState_t state = new();
+            TrackedDevicePose_t trackedDevicePose = new();
 
             try
             {
-                device.GetControllerStateWithPose(universeOrigin, 
-                                                  Index, 
-                                                  ref state, 
+                device.GetControllerStateWithPose(universeOrigin,
+                                                  Index,
+                                                  ref state,
                                                   Marshal.SizeOf<VRControllerState_t>(),
                                                   ref trackedDevicePose);
 

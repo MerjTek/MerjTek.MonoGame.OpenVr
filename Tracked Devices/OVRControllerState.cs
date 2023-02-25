@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Valve.VR;
 
 namespace MerjTek.MonoGame.OpenVr
@@ -12,17 +10,8 @@ namespace MerjTek.MonoGame.OpenVr
     /// </summary>
     public struct OVRControllerState
     {
-        #region Constants
-
-        const int cAxisTypesCount = 5;
-
-        #endregion
         #region Private Variables
 
-        private readonly EVRControllerAxisType[] axisTypes;
-        private readonly int axisCount;
-        private readonly int touchPadCount;
-        private readonly int triggerCount;
         private readonly OVRController.ControllerHandedness handedness;
 
         #endregion
@@ -73,40 +62,7 @@ namespace MerjTek.MonoGame.OpenVr
         /// <summary>
         /// The Menu Button.
         /// </summary>
-        public bool GripButton { get; internal set; }
-
-        #endregion
-        #region Axes, Triggers, and TouchPads
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public OVRControllerAxis[] Axes { get; internal set; }
-
-        /// <summary>
-        /// THe number of axes on this controller.
-        /// </summary>
-        public int AxisCount { get { return axisCount; } }
-
-        /// <summary>
-        /// The Triggers
-        /// </summary>
-        public OVRControllerTrigger[] Triggers { get; internal set; }
-
-        /// <summary>
-        /// The numbers of triggers on this controller.
-        /// </summary>
-        public int TriggerCount { get { return triggerCount; } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public OVRControllerAxis TouchPad { get; internal set; }
-
-        /// <summary>
-        /// The numbers of touch pads on this controller.
-        /// </summary>
-        public int TouchPadCount { get { return touchPadCount; } }
+        public bool SideButton { get; internal set; }
 
         /// <summary>
         /// The Touch Pad has been touched
@@ -119,6 +75,29 @@ namespace MerjTek.MonoGame.OpenVr
         public bool TouchPadPressed { get; internal set; }
 
         #endregion
+        #region Joystick, Triggers, and TouchPad
+
+        /// <summary>
+        /// The Front Trigger
+        /// </summary>
+        public float FrontTrigger { get; internal set; }
+
+        /// <summary>
+        /// The Joystick.
+        /// </summary>
+        public Vector2 Joystick { get; internal set; }
+
+        /// <summary>
+        /// The Side Trigger.
+        /// </summary>
+        public float SideTrigger { get; internal set; }
+
+        /// <summary>
+        /// The TouchPad.
+        /// </summary>
+        public Vector2 TouchPad { get; internal set; }
+
+        #endregion
 
         #endregion
 
@@ -127,58 +106,9 @@ namespace MerjTek.MonoGame.OpenVr
         /// <summary>
         /// Initializes a new instance of the OpenVRControllerState class.
         /// </summary>
-        /// <param name="deviceIndex">The device index of the controller.</param>
         /// <param name="hand">The handedness of the controller.</param>
-        public OVRControllerState(int deviceIndex,
-                                  OVRController.ControllerHandedness hand)
+        public OVRControllerState(OVRController.ControllerHandedness hand)
         {
-            OVRDevice device = OVRDevice.Get();
-
-            #region Count the number of Axis types to use.
-
-            axisCount = 0;
-            touchPadCount = 0;
-            triggerCount = 0;
-            axisTypes = new EVRControllerAxisType[cAxisTypesCount];
-
-            ETrackedPropertyError error = ETrackedPropertyError.TrackedProp_Success;
-            for (int i = 0; i < cAxisTypesCount; i++)
-            {
-                axisTypes[i] = (EVRControllerAxisType)device.GetInt32TrackedDeviceProperty(
-                                  deviceIndex,
-                                  ETrackedDeviceProperty.Prop_Axis0Type_Int32 + i,
-                                  ref error);
-
-                switch (axisTypes[i])
-                {
-                    case EVRControllerAxisType.k_eControllerAxis_TrackPad: touchPadCount++; break;
-                    case EVRControllerAxisType.k_eControllerAxis_Joystick: axisCount++; break;
-                    case EVRControllerAxisType.k_eControllerAxis_Trigger: triggerCount++; break;
-                    case EVRControllerAxisType.k_eControllerAxis_None:
-                    default:
-                        break;
-                };
-            }
-
-            #region Based on the counts, allocate each type of array
-
-            if (axisCount > 0)
-                Axes = new OVRControllerAxis[axisCount];
-            else
-                Axes = new OVRControllerAxis[1];
-
-            if (triggerCount > 0)
-                Triggers = new OVRControllerTrigger[triggerCount];
-            else
-                Triggers = new OVRControllerTrigger[1];
-
-            // NOTE: Always allocate one of these
-            TouchPad = new OVRControllerAxis();
-
-            #endregion
-
-            #endregion
-
             SystemButton = false;
             MenuButton = false;
             AButton = false;
@@ -186,10 +116,14 @@ namespace MerjTek.MonoGame.OpenVr
             XButton = false;
             YButton = false;
             JoystickButton = false;
-            GripButton = false;
+            SideButton = false;
             TriggerButton = false;
             TouchPadTouched = false;
             TouchPadPressed = false;
+            Joystick = Vector2.Zero;
+            TouchPad = Vector2.Zero;
+            FrontTrigger = 0;
+            SideTrigger = 0;
             handedness = hand;
         }
 
@@ -199,132 +133,61 @@ namespace MerjTek.MonoGame.OpenVr
 
         #region UpdatepAxes (Private)
 
+        #region GetXAxisByIndex (Private)
+
+        static private float GetXAxisByIndex(ref VRControllerState_t state, int index)
+        {
+            return index switch
+            {
+                0 => state.rAxis0.x,
+                1 => state.rAxis1.x,
+                2 => state.rAxis2.x,
+                3 => state.rAxis3.x,
+                4 => state.rAxis4.x,
+                _ => 0,
+            };
+        }
+
+        #endregion
+        #region GetYAxisByIndex (Private)
+
+        static private float GetYAxisByIndex(ref VRControllerState_t state, int index)
+        {
+            return index switch
+            {
+                0 => state.rAxis0.y,
+                1 => state.rAxis1.y,
+                2 => state.rAxis2.y,
+                3 => state.rAxis3.y,
+                4 => state.rAxis4.y,
+                _ => 0,
+            };
+        }
+
+        #endregion
+
         private void UpdateAxes(ref VRControllerState_t state,
                                 OVRControllerProfile profile)
         {
-            int axisCount = 0;
-            int triggerCount = 0;
+            Joystick = new Vector2(
+                GetXAxisByIndex(ref state, profile.Joystick_AxisX),
+                GetYAxisByIndex(ref state, profile.Joystick_AxisY));
 
-            #region state.rAxis0
+            TouchPad = new Vector2(
+                GetXAxisByIndex(ref state, profile.TouchPad_AxisX),
+                GetYAxisByIndex(ref state, profile.TouchPad_AxisY));
 
-            switch (axisTypes[0])
-            {
-                case EVRControllerAxisType.k_eControllerAxis_TrackPad:
-                    TouchPad = state.rAxis0.ToVector2().ToOVRControllerAxis();
-                    break;
+            // NOTE: Should the X or Y axis be used.
+            if (-1 == profile.FrontTrigger_AxisY)
+                FrontTrigger = GetXAxisByIndex(ref state, profile.FrontTrigger_AxisX);
+            else if (-1 == profile.FrontTrigger_AxisX)
+                FrontTrigger = GetYAxisByIndex(ref state, profile.FrontTrigger_AxisY);
 
-                case EVRControllerAxisType.k_eControllerAxis_Trigger:
-                    Triggers[triggerCount] = state.rAxis0.ToVector2().X.ToOVRControllerTrigger();
-                    triggerCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Joystick:
-                    Axes[axisCount] = state.rAxis0.ToVector2().ToOVRControllerAxis();
-                    axisCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_None:
-                default:
-                    break;
-            }
-
-            #endregion
-            #region state.rAxis1
-
-            switch (axisTypes[1])
-            {
-                case EVRControllerAxisType.k_eControllerAxis_TrackPad:
-                    TouchPad = state.rAxis1.ToVector2().ToOVRControllerAxis();
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Trigger:
-                    Triggers[triggerCount] = state.rAxis1.ToVector2().X.ToOVRControllerTrigger();
-                    triggerCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Joystick:
-                    Axes[axisCount] = state.rAxis1.ToVector2().ToOVRControllerAxis();
-                    axisCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_None:
-                default:
-                    break;
-            }
-
-            #endregion
-            #region state.rAxis2
-
-            switch (axisTypes[2])
-            {
-                case EVRControllerAxisType.k_eControllerAxis_TrackPad:
-                    TouchPad = state.rAxis2.ToVector2().ToOVRControllerAxis();
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Trigger:
-                    Triggers[triggerCount] = state.rAxis2.ToVector2().X.ToOVRControllerTrigger();
-                    triggerCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Joystick:
-                    Axes[axisCount] = state.rAxis2.ToVector2().ToOVRControllerAxis();
-                    axisCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_None:
-                default:
-                    break;
-            }
-
-            #endregion
-            #region state.rAxis3
-
-            switch (axisTypes[3])
-            {
-                case EVRControllerAxisType.k_eControllerAxis_TrackPad:
-                    TouchPad = state.rAxis3.ToVector2().ToOVRControllerAxis();
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Trigger:
-                    Triggers[triggerCount] = state.rAxis3.ToVector2().X.ToOVRControllerTrigger();
-                    triggerCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Joystick:
-                    Axes[axisCount] = state.rAxis3.ToVector2().ToOVRControllerAxis();
-                    axisCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_None:
-                default:
-                    break;
-            }
-
-            #endregion
-            #region state.rAxis4
-
-            switch (axisTypes[4])
-            {
-                case EVRControllerAxisType.k_eControllerAxis_TrackPad:
-                    TouchPad = state.rAxis4.ToVector2().ToOVRControllerAxis();
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Trigger:
-                    Triggers[triggerCount] = state.rAxis4.ToVector2().X.ToOVRControllerTrigger();
-                    triggerCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_Joystick:
-                    Axes[axisCount] = state.rAxis4.ToVector2().ToOVRControllerAxis();
-                    axisCount++;
-                    break;
-
-                case EVRControllerAxisType.k_eControllerAxis_None:
-                default:
-                    break;
-            }
-
-            #endregion
+            // NOTE: Should the X or Y axis be used.
+            if (-1 == profile.SideTrigger_AxisY)
+                SideTrigger = GetXAxisByIndex(ref state, profile.SideTrigger_AxisX);
+            else if (-1 == profile.SideTrigger_AxisX)
+                SideTrigger = GetYAxisByIndex(ref state, profile.SideTrigger_AxisY);
         }
 
         #endregion
@@ -332,10 +195,10 @@ namespace MerjTek.MonoGame.OpenVr
 
         #region IsBitSet (Private)
 
-        bool IsBitSet(ulong pressed, int shift)
+        static bool IsBitSet(ulong pressed, int shift)
         {
             ulong value = (1UL << shift);
-            return (pressed & value) == value;
+            return (pressed & value) != 0;
         }
 
         #endregion
@@ -349,7 +212,7 @@ namespace MerjTek.MonoGame.OpenVr
                 BButton = IsBitSet(state.ulButtonTouched, profile.BButtonIndex);
             }
 
-            if (OVRController.ControllerHandedness.Left == handedness)
+            if (OVRController.ControllerHandedness.Right == handedness)
             {
                 XButton = IsBitSet(state.ulButtonTouched, profile.XButtonIndex);
                 YButton = IsBitSet(state.ulButtonTouched, profile.YButtonIndex);
@@ -358,7 +221,7 @@ namespace MerjTek.MonoGame.OpenVr
             SystemButton = IsBitSet(state.ulButtonTouched, profile.SystemButtonIndex);
             MenuButton = IsBitSet(state.ulButtonTouched, profile.MenuButtonIndex);
             JoystickButton = IsBitSet(state.ulButtonTouched, profile.JoystickButtonIndex);
-            GripButton = IsBitSet(state.ulButtonTouched, profile.GripButtonIndex);
+            SideButton = IsBitSet(state.ulButtonTouched, profile.SideButtonIndex);
             TriggerButton = IsBitSet(state.ulButtonTouched, profile.TriggerButtonIndex);
             TouchPadTouched = IsBitSet(state.ulButtonTouched, profile.TouchPadTouchedIndex);
             TouchPadPressed = IsBitSet(state.ulButtonPressed, profile.TouchPadTouchedIndex);
@@ -390,6 +253,51 @@ namespace MerjTek.MonoGame.OpenVr
     public struct OVRControllerProfile
     {
         #region Public Properties
+
+        #region Axes
+
+        /// <summary>
+        /// Whick hardware axis is used as the joystick X axis [0 to 4].
+        /// </summary>
+        public int Joystick_AxisX { get; set; } = -1;
+
+        /// <summary>
+        /// Whick hardware axis is used as the joystick Y axis [0 to 4].
+        /// </summary>
+        public int Joystick_AxisY { get; set; } = -1;
+
+        /// <summary>
+        /// Whick hardware axis is used as the touchpad X axis [0 to 4].
+        /// </summary>
+        public int TouchPad_AxisX { get; set; } = -1;
+
+        /// <summary>
+        /// Whick hardware axis is used as the touchpad Y axis [0 to 4].
+        /// </summary>
+        public int TouchPad_AxisY { get; set; } = -1;
+
+        /// <summary>
+        /// Whick hardware X axis is used as the front trigger [0 to 4].
+        /// </summary>
+        public int FrontTrigger_AxisX { get; set; } = -1;
+
+        /// <summary>
+        /// Whick hardware Y axis is used as the front trigger [0 to 4].
+        /// </summary>
+        public int FrontTrigger_AxisY { get; set; } = -1;
+
+        /// <summary>
+        /// Whick hardware X axis is used as the side trigger [0 to 4].
+        /// </summary>
+        public int SideTrigger_AxisX { get; set; } = -1;
+
+        /// <summary>
+        /// Whick hardware Y axis is used as the side trigger [0 to 4].
+        /// </summary>
+        public int SideTrigger_AxisY { get; set; } = -1;
+
+        #endregion
+        #region Buttons
 
         /// <summary>
         /// The System Button index.
@@ -429,7 +337,7 @@ namespace MerjTek.MonoGame.OpenVr
         /// <summary>
         /// The Grip Button index.
         /// </summary>
-        public int GripButtonIndex { get; set; } = 0;
+        public int SideButtonIndex { get; set; } = 0;
 
         /// <summary>
         /// The Trigget Button index.
@@ -445,6 +353,8 @@ namespace MerjTek.MonoGame.OpenVr
         /// The TouchPad has been pressed index.
         /// </summary>
         public int TouchPadPressedIndex { get; set; } = 0;
+
+        #endregion
 
         #endregion
 
@@ -515,10 +425,23 @@ namespace MerjTek.MonoGame.OpenVr
 
         static OVRControllerProfile()
         {
+            // TODO: Set these bits to their appropriate values.
+
             #region Default
 
             Default = new OVRControllerProfile()
             {
+                // Axes
+                Joystick_AxisX = -1, // Unused
+                Joystick_AxisY = -1, // Unused
+                TouchPad_AxisX = -1, // Unused
+                TouchPad_AxisY = -1, // Unused
+                FrontTrigger_AxisX = -1, // Unused
+                FrontTrigger_AxisY = -1, // Unused
+                SideTrigger_AxisX = -1, // Unused
+                SideTrigger_AxisY = -1, // Unused
+
+                // Buttons
                 SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
                 MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
                 AButtonIndex = (int)EVRButtonId.k_EButton_A,
@@ -526,7 +449,123 @@ namespace MerjTek.MonoGame.OpenVr
                 XButtonIndex = (int)EVRButtonId.k_EButton_A,
                 YButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
                 JoystickButtonIndex = (int)EVRButtonId.k_EButton_IndexController_JoyStick,
-                GripButtonIndex = (int)EVRButtonId.k_EButton_Grip,
+                SideButtonIndex = (int)EVRButtonId.k_EButton_Grip,
+                TriggerButtonIndex = (int)EVRButtonId.k_EButton_SteamVR_Trigger,
+                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
+                TouchPadPressedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
+            };
+
+            #endregion
+            #region HP
+
+            HP = new OVRControllerProfile()
+            {
+                // Axes
+                Joystick_AxisX = -1, // Unused
+                Joystick_AxisY = -1, // Unused
+                TouchPad_AxisX = -1, // Unused
+                TouchPad_AxisY = -1, // Unused
+                FrontTrigger_AxisX = -1, // Unused
+                FrontTrigger_AxisY = -1, // Unused
+                SideTrigger_AxisX = -1, // Unused
+                SideTrigger_AxisY = -1, // Unused
+
+                // Buttons
+                SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
+                MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
+                AButtonIndex = (int)EVRButtonId.k_EButton_A,
+                BButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                XButtonIndex = (int)EVRButtonId.k_EButton_A,
+                YButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                JoystickButtonIndex = (int)EVRButtonId.k_EButton_IndexController_JoyStick,
+                SideButtonIndex = (int)EVRButtonId.k_EButton_Grip,
+                TriggerButtonIndex = (int)EVRButtonId.k_EButton_SteamVR_Trigger,
+                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
+                TouchPadPressedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
+            };
+
+            #endregion
+            #region HTC
+
+            HTC = new OVRControllerProfile()
+            {
+                // Axes
+                Joystick_AxisX = -1, // Unused
+                Joystick_AxisY = -1, // Unused
+                TouchPad_AxisX = 0,
+                TouchPad_AxisY = 1,
+                FrontTrigger_AxisX = 2, // Unused
+                FrontTrigger_AxisY = -1, // Unused
+                SideTrigger_AxisX = -1, // Unused
+                SideTrigger_AxisY = -1, // Unused
+
+                // Buttons
+                SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
+                MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
+                AButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                BButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                XButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                YButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                JoystickButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                SideButtonIndex = 2,
+                TriggerButtonIndex = 15,
+                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                TouchPadPressedIndex = 14,
+            };
+
+            #endregion
+            #region Oculus / Meta
+
+            Oculus = new OVRControllerProfile
+            {
+                // Axes
+                Joystick_AxisX = -1, // Unused
+                Joystick_AxisY = -1, // Unused
+                TouchPad_AxisX = 0,
+                TouchPad_AxisY = 1,
+                FrontTrigger_AxisX = 2, // Unused
+                FrontTrigger_AxisY = -1, // Unused
+                SideTrigger_AxisX = 4, // Unused
+                SideTrigger_AxisY = -1, // Unused
+
+                // Buttons
+                SystemButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                MenuButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                AButtonIndex = 7,
+                BButtonIndex = 1,
+                XButtonIndex = 7,
+                YButtonIndex = 1,
+                JoystickButtonIndex = 14,
+                SideButtonIndex = 2,
+                TriggerButtonIndex = 15,
+                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                TouchPadPressedIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+            };
+
+            #endregion
+            #region Pico
+
+            Pico = new OVRControllerProfile()
+            {
+                // Axes
+                Joystick_AxisX = -1, // Unused
+                Joystick_AxisY = -1, // Unused
+                TouchPad_AxisX = -1, // Unused
+                TouchPad_AxisY = -1, // Unused
+                FrontTrigger_AxisX = -1, // Unused
+                FrontTrigger_AxisY = -1, // Unused
+                SideTrigger_AxisX = -1, // Unused
+                SideTrigger_AxisY = -1, // Unused
+
+                // Buttons                
+                SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
+                MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
+                AButtonIndex = (int)EVRButtonId.k_EButton_A,
+                BButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                XButtonIndex = (int)EVRButtonId.k_EButton_A,
+                YButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                JoystickButtonIndex = (int)EVRButtonId.k_EButton_IndexController_JoyStick,
+                SideButtonIndex = (int)EVRButtonId.k_EButton_Grip,
                 TriggerButtonIndex = (int)EVRButtonId.k_EButton_SteamVR_Trigger,
                 TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
                 TouchPadPressedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
@@ -537,91 +576,17 @@ namespace MerjTek.MonoGame.OpenVr
 
             Valve = new OVRControllerProfile()
             {
-                SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
-                MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
-                AButtonIndex = 0,
-                BButtonIndex = 0,
-                XButtonIndex = 0,
-                YButtonIndex = 0,
-                JoystickButtonIndex = 0,
-                GripButtonIndex = 0,
-                TriggerButtonIndex = 0,
-                TouchPadTouchedIndex = 0,
-                TouchPadPressedIndex = 0,
-            };
+                // Axes
+                Joystick_AxisX = -1, // Unused
+                Joystick_AxisY = -1, // Unused
+                TouchPad_AxisX = -1, // Unused
+                TouchPad_AxisY = -1, // Unused
+                FrontTrigger_AxisX = -1, // Unused
+                FrontTrigger_AxisY = -1, // Unused
+                SideTrigger_AxisX = -1, // Unused
+                SideTrigger_AxisY = -1, // Unused
 
-            #endregion
-            #region Windows Mixed Reality
-            #endregion
-            #region Oculus / Meta
-
-            Oculus = new OVRControllerProfile
-            {
-                /*
-                Axis 0 = Left/Right on the joystick
-                Axis 1 = Forward/Backward on the joystick
-                Axis 2 = Front trigger
-                Axis 4 = Side trigger
-                */
-                SystemButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                MenuButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                AButtonIndex = 7,
-                BButtonIndex = 1,
-                XButtonIndex = 7,
-                YButtonIndex = 1,
-                JoystickButtonIndex = 14,
-                GripButtonIndex = 2,
-                TriggerButtonIndex = 15,
-                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                TouchPadPressedIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-            };
-
-            #endregion
-            #region HTC
-
-            HTC = new OVRControllerProfile()
-            {
-                /*
-                Axis 0 = Left/Right on the touchpad
-                Axis 1 = Forward/Backward on the touchpad
-                Axis 2 = Front trigger
-                */
-                SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
-                MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
-                AButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                BButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                XButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                YButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                JoystickButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                GripButtonIndex = 2,
-                TriggerButtonIndex = 15,
-                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
-                TouchPadPressedIndex = 14,
-            };
-
-            #endregion
-            #region HP
-
-            HP = new OVRControllerProfile()
-            {
-                SystemButtonIndex = 0,
-                MenuButtonIndex = 0,
-                AButtonIndex = 0,
-                BButtonIndex = 0,
-                XButtonIndex = 0,
-                YButtonIndex = 0,
-                JoystickButtonIndex = 0,
-                GripButtonIndex = 0,
-                TriggerButtonIndex = 0,
-                TouchPadTouchedIndex = 0,
-                TouchPadPressedIndex = 0,
-            };
-
-            #endregion
-            #region Pico
-
-            Pico = new OVRControllerProfile()
-            {
+                // Buttons
                 SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
                 MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
                 AButtonIndex = (int)EVRButtonId.k_EButton_A,
@@ -629,255 +594,42 @@ namespace MerjTek.MonoGame.OpenVr
                 XButtonIndex = (int)EVRButtonId.k_EButton_A,
                 YButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
                 JoystickButtonIndex = (int)EVRButtonId.k_EButton_IndexController_JoyStick,
-                GripButtonIndex = (int)EVRButtonId.k_EButton_Grip,
+                SideButtonIndex = (int)EVRButtonId.k_EButton_Grip,
                 TriggerButtonIndex = (int)EVRButtonId.k_EButton_SteamVR_Trigger,
                 TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
                 TouchPadPressedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
+
             };
 
             #endregion
-        }
+            #region Windows Mixed Reality
 
-        #endregion
-    }
-
-    #endregion
-    #region OVRControllerAxis
-
-    /// <summary>
-    /// Holds an axis value.
-    /// </summary>
-    public struct OVRControllerAxis
-    {
-        #region Private Variables
-
-        private float x;
-        private float y;
-
-        #endregion
-        #region Public Properties
-
-        /// <summary>
-        /// The X value for the axis.
-        /// </summary>
-        public float X { get; set; }
-
-        /// <summary>
-        /// The Y value for the axis.
-        /// </summary>
-        public float Y { get; set; }
-
-        #endregion
-
-        /// <summary>
-        /// Creates an instance of the OVRControllerAxis class.
-        /// </summary>
-        /// <param name="axisPos">The axis value to set.</param>
-        public OVRControllerAxis(Vector2 axisPos)
-        {
-            this = default;
-            X = Math.Clamp(axisPos.X, -1, 1);
-            Y = Math.Clamp(axisPos.Y, -1, 1);
-        }
-
-        #region Operators
-
-        /// <summary>
-        /// The equals operator.
-        /// </summary>
-        /// <param name="left">The left side of the equation.</param>
-        /// <param name="right">he right side of the equation.</param>
-        /// <returns>True if both sides are equal.</returns>
-        [MethodImpl((MethodImplOptions)0x100)] // MethodImplOptions.AggressiveInlining
-        public static bool operator ==(OVRControllerAxis left, OVRControllerAxis right)
-        {
-            if (left.X == right.X && left.Y == right.Y)
-                return true;
-
-            return false;
-        }
-
-        /// <summary>
-        /// The not equals operator.
-        /// </summary>
-        /// <param name="left">The left side of the equation.</param>
-        /// <param name="right">he right side of the equation.</param>
-        /// <returns>True if both sides are not equal.</returns>
-        [MethodImpl((MethodImplOptions)0x100)] // MethodImplOptions.AggressiveInlining
-        public static bool operator !=(OVRControllerAxis left, OVRControllerAxis right)
-        {
-            return !(left == right);
-        }
-
-        #endregion
-        #region IEquatable Implementation
-
-        /// <summary>
-        /// The equals method.
-        /// </summary>
-        /// <param name="obj">The object to be compared.</param>
-        /// <returns>True if the passed in value is equal to the oiginal value.</returns>
-#pragma warning disable CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
-        public override bool Equals(object obj)
-#pragma warning restore CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
-        {
-
-            switch (obj)
+            WindowsMixedReality = new OVRControllerProfile()
             {
-                case OVRControllerAxis:
-                    return this == (OVRControllerAxis)obj;
-                default:
-                    return false;
-            }
-        }
+                // Axes
+                Joystick_AxisX = -1, // Unused
+                Joystick_AxisY = -1, // Unused
+                TouchPad_AxisX = -1, // Unused
+                TouchPad_AxisY = -1, // Unused
+                FrontTrigger_Axis = -1, // Unused
+                SideTrigger_Axis = -1, // Unused
 
-        /// <summary>
-        /// Retreiving the hash code for this object.
-        /// </summary>
-        /// <returns>The hash code.</returns>
-        public override int GetHashCode()
-        {
-            return X.GetHashCode() ^ Y.GetHashCode();
-        }
+                // Buttons                
+                SystemButtonIndex = (int)EVRButtonId.k_EButton_System,
+                MenuButtonIndex = (int)EVRButtonId.k_EButton_ApplicationMenu,
+                AButtonIndex = (int)EVRButtonId.k_EButton_A,
+                BButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                XButtonIndex = (int)EVRButtonId.k_EButton_A,
+                YButtonIndex = (int)EVRButtonId.k_EButton_Max, // TODO:
+                JoystickButtonIndex = (int)EVRButtonId.k_EButton_IndexController_JoyStick,
+                SideButtonIndex = (int)EVRButtonId.k_EButton_Grip,
+                TriggerButtonIndex = (int)EVRButtonId.k_EButton_SteamVR_Trigger,
+                TouchPadTouchedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
+                TouchPadPressedIndex = (int)EVRButtonId.k_EButton_SteamVR_Touchpad,
 
-        /// <summary>
-        /// Converting this object to a string.
-        /// </summary>
-        /// <returns>A string describing this object.</returns>
-        public override string ToString()
-        {
-            return "[OVRControllerAxis: Axis= [" + X.ToString() + ", " + Y.ToString() + "]";
-        }
+            };
 
-        #endregion
-    }
-
-    #endregion
-    #region OVRControllerTrigger
-
-    /// <summary>
-    /// Holds a trigger value.
-    /// </summary>
-    public struct OVRControllerTrigger
-    {
-        #region Public Properties
-
-        /// <summary>
-        /// The trigger for this value.
-        /// </summary>
-        public float Trigger { get; private set; }
-
-        #endregion
-
-        /// <summary>
-        /// Creates an instance of the OVRControllerTrigger class.
-        /// </summary>
-        /// <param name="trigger">The axis value to set.</param>
-        public OVRControllerTrigger(float trigger)
-        {
-            this = default;
-            Trigger = MathHelper.Clamp(trigger, 0f, 1f);
-        }
-
-        #region Operators
-
-        /// <summary>
-        /// The equals operator.
-        /// </summary>
-        /// <param name="left">The left side of the equation.</param>
-        /// <param name="right">he right side of the equation.</param>
-        /// <returns>True if both sides are equal.</returns>
-        [MethodImpl((MethodImplOptions)0x100)] // MethodImplOptions.AggressiveInlining
-        public static bool operator ==(OVRControllerTrigger left, OVRControllerTrigger right)
-        {
-            if (left.Trigger == right.Trigger)
-            {
-                return left.Trigger == right.Trigger;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// The not equals operator.
-        /// </summary>
-        /// <param name="left">The left side of the equation.</param>
-        /// <param name="right">he right side of the equation.</param>
-        /// <returns>True if both sides are not equal.</returns>
-        [MethodImpl((MethodImplOptions)0x100)] // MethodImplOptions.AggressiveInlining
-        public static bool operator !=(OVRControllerTrigger left, OVRControllerTrigger right)
-        {
-            return !(left == right);
-        }
-
-        #endregion
-        #region IEquatable Implementation
-
-        /// <summary>
-        /// The equals method.
-        /// </summary>
-        /// <param name="obj">The object to be compared.</param>
-        /// <returns>True if the passed in value is equal to the oiginal value.</returns>
-#pragma warning disable CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
-        public override bool Equals(object obj)
-        {
-#pragma warning restore CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
-            if (obj is OVRControllerTrigger trigger)
-                return this == trigger;
-
-            return false;
-        }
-
-        /// <summary>
-        /// Retreiving the hash code for this object.
-        /// </summary>
-        /// <returns>The hash code.</returns>
-        public override int GetHashCode()
-        {
-            return Trigger.GetHashCode();
-        }
-
-        /// <summary>
-        /// Converting this object to a string.
-        /// </summary>
-        /// <returns>A string describing this object.</returns>
-        public override string ToString()
-        {
-            return "[OVRControllerTrigger: Trigger=" + Trigger + "]";
-        }
-
-        #endregion
-    }
-
-    #endregion
-    #region OVRControllerExt
-
-    /// <summary>
-    /// Extension class tha adds static methods for OpenVRController classes.
-    /// </summary>
-    static public class OVRControllerExt
-    {
-        #region ToVector2 (VRControllerAxis_t)
-
-        static internal Vector2 ToVector2(this VRControllerAxis_t axis)
-        {
-            return new Vector2(axis.x, axis.y);
-        }
-
-        #endregion
-        #region ToOVRControllerAxis (Vector2)
-
-        static internal OVRControllerAxis ToOVRControllerAxis(this Vector2 axis)
-        {
-            return new OVRControllerAxis(axis);
-        }
-
-        #endregion
-        #region ToOVRControllerTrigger (float)
-
-        static internal OVRControllerTrigger ToOVRControllerTrigger(this float trigger)
-        {
-            return new OVRControllerTrigger(trigger);
+            #endregion
         }
 
         #endregion
