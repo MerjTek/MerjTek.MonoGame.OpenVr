@@ -328,7 +328,6 @@ namespace MerjTek.MonoGame.OpenVr
         /// <param name="index">The index of the controller.</param>
         /// <param name="property">Which property to get.</param>
         /// <param name="error">The error returned when attempting to fetch this property. This can be NULL if the caller doesn't care about the source of a property error.</param>
-        /// <returns>The type of axis.</returns>
         /// <returns>The static property.</returns>
         public bool GetBoolTrackedDeviceProperty(
             int index,
