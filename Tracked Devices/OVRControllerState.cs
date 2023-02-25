@@ -611,8 +611,10 @@ namespace MerjTek.MonoGame.OpenVr
                 Joystick_AxisY = -1, // Unused
                 TouchPad_AxisX = -1, // Unused
                 TouchPad_AxisY = -1, // Unused
-                FrontTrigger_Axis = -1, // Unused
-                SideTrigger_Axis = -1, // Unused
+                FrontTrigger_AxisX = -1, // Unused
+                FrontTrigger_AxisY = -1, // Unused
+                SideTrigger_AxisX = -1, // Unused
+                SideTrigger_AxisY = -1, // Unused
 
                 // Buttons                
                 SystemButtonIndex = (int)EVRButtonId.k_EButton_System,

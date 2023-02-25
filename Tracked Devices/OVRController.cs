@@ -50,7 +50,11 @@ namespace MerjTek.MonoGame.OpenVr
         /// <summary>
         /// The controller's profile.
         /// </summary>
-        public OVRControllerProfile ControllerProfile => profile;
+        public OVRControllerProfile ControllerProfile
+        {
+            get { return profile; }
+            set { profile = value; }
+        }
 
         /// <summary>
         /// The Handedness of the controller.
