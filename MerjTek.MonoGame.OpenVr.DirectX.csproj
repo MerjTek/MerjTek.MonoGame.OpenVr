@@ -19,9 +19,11 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/MerjTek/MerjTek.MonoGame.OpenVr</RepositoryUrl>
     <PackageProjectUrl>https://github.com/MerjTek/MerjTek.MonoGame.OpenVr</PackageProjectUrl>
-    <PackageReleaseNotes>1.0.0 - Initial Release</PackageReleaseNotes>
-    <FileVersion>1.0.0</FileVersion>
-    <AssemblyFileVersion>1.0.0</AssemblyFileVersion>
+    <PackageReleaseNotes>1.0.1 - Updated the Controller information so that once a profile is properly set up, the joystick, trackpad, and axes information plus all button indices can be properly read.
+1.0.0 - Initial Release</PackageReleaseNotes>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+    <Version>$(AssemblyVersion)</Version>  
   </PropertyGroup>
 
   <ItemGroup>

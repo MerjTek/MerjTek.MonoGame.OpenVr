@@ -3,15 +3,15 @@
 MerjTek.MonoGame.OpenVr is a library that works on WIndows to add OpenVR (SteamVR) abilities to a MonoGame project.
 
 
-## ToDo List
-* Controllers
-    * Update the OVRControllerProfile to include axis information for the touchpad, joystick, and or triggers
-    * Update the bits of each button in every profile once I obtain the correct information.
+## Help Needed
+* Fill in the different hardware OVRControllerProfiles for each VR device. This is the rAxis and ulButtonPressed information for each device.
+    * Can those with various VR Hardware possibly help?
+* Finish getting the correct position and rotation information for the OVRController.
 
 
 ## Nuget Packages
--[ MerjTek.MonoGame.OpenVr.DirectX ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.DirectX) v1.0.0  
--[ MerjTek.MonoGame.OpenVr.OpenGL ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.OpenGL) v1.0.0  
+-[ MerjTek.MonoGame.OpenVr.DirectX ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.DirectX) v1.0.1  
+-[ MerjTek.MonoGame.OpenVr.OpenGL ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.OpenGL) v1.0.1  
 
 
 ## How To Use
