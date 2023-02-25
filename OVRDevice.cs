@@ -329,6 +329,7 @@ namespace MerjTek.MonoGame.OpenVr
         /// <param name="property">Which property to get.</param>
         /// <param name="error">The error returned when attempting to fetch this property. This can be NULL if the caller doesn't care about the source of a property error.</param>
         /// <returns>The type of axis.</returns>
+        /// <returns>The static property.</returns>
         public bool GetBoolTrackedDeviceProperty(
             int index,
             ETrackedDeviceProperty property,
@@ -349,7 +350,7 @@ namespace MerjTek.MonoGame.OpenVr
         /// <param name="index">The index of the controller.</param>
         /// <param name="property">Which property to get.</param>
         /// <param name="error">The error returned when attempting to fetch this property. This can be NULL if the caller doesn't care about the source of a property error.</param>
-        /// <returns>The type of axis.</returns>
+        /// <returns>The static property.</returns>
         public float GetFloatTrackedDeviceProperty(
             int index,
             ETrackedDeviceProperty property,
@@ -370,7 +371,7 @@ namespace MerjTek.MonoGame.OpenVr
         /// <param name="index">The index of the controller.</param>
         /// <param name="property">Which property to get.</param>
         /// <param name="error">The error returned when attempting to fetch this property. This can be NULL if the caller doesn't care about the source of a property error.</param>
-        /// <returns>The type of axis.</returns>
+        /// <returns>The static property.</returns>
         public int GetInt32TrackedDeviceProperty(
             int index,
             ETrackedDeviceProperty property,
@@ -391,7 +392,7 @@ namespace MerjTek.MonoGame.OpenVr
         /// <param name="index">The index of the controller.</param>
         /// <param name="property">Which property to get.</param>
         /// <param name="error">The error returned when attempting to fetch this property. This can be NULL if the caller doesn't care about the source of a property error.</param>
-        /// <returns>The type of axis.</returns>
+        /// <returns>The static property.</returns>
         public ulong GetUInt64TrackedDeviceProperty(
             int index,
             ETrackedDeviceProperty property,
@@ -414,23 +415,38 @@ namespace MerjTek.MonoGame.OpenVr
         /// <param name="property">Which property to get.</param>
         /// <param name="maxSize">The maximum string size for the property.</param>
         /// <param name="error">The error returned when attempting to fetch this property. This can be NULL if the caller doesn't care about the source of a property error.</param>
-        /// <returns>The type of axis.</returns>
+        /// <returns>The static property.</returns>
         public string GetStringTrackedDeviceProperty(
             int index,
-            ETrackedDeviceProperty property, 
+            ETrackedDeviceProperty property,
             uint maxSize,
             ref ETrackedPropertyError error)
         {
-            StringBuilder sb = new StringBuilder();
-
-            cVrSystem.GetStringTrackedDeviceProperty(
+            int capacity = (int)cVrSystem.GetStringTrackedDeviceProperty(
                 (uint)index,
                 property,
-                sb,
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+                null,
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
                 maxSize,
                 ref error);
 
-            return sb.ToString();
+            if (capacity > 0)
+            {
+                StringBuilder sb = new StringBuilder(capacity);
+
+                cVrSystem.GetStringTrackedDeviceProperty(
+                    (uint)index,
+                    property,
+                    sb,
+                    (uint)capacity,
+                    ref error);
+
+                if (error == ETrackedPropertyError.TrackedProp_Success)
+                    return sb.ToString();
+            }
+
+            return string.Empty;
         }
 
         #endregion
