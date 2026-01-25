@@ -93,16 +93,12 @@ namespace MerjTek.MonoGame.OpenVr
         /// <summary>
         /// Initializes a new instance of the VrGame class.
         /// </summary>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public VrGame() : base()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             #region Null Variables
 
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             leftEyeTarget = null;
             rightEyeTarget = null;
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
             #endregion
 
@@ -248,6 +244,21 @@ namespace MerjTek.MonoGame.OpenVr
                                                         out Matrix projection);
 
             DrawScene(viewMatrix * Matrix.Invert(pose * view), projection);
+        }
+
+        #endregion
+        #region RenderLeftEyeToScreen (Public)
+
+        /// <summary>
+        /// OPTIONAL: Render the left eye to the screen
+        /// </summary>
+        /// <param name="spriteBatch"><i>The <see cref="SpriteBatch"/> to use to render the left eye.</i></param>
+        public void RenderLeftEyeToScreen(
+            SpriteBatch spriteBatch)
+        {
+            spriteBatch.Begin();
+            spriteBatch.Draw(leftEyeTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
         }
 
         #endregion

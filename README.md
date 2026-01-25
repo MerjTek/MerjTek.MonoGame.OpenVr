@@ -1,6 +1,6 @@
 # MerjTek.MonoGame.OpenVr
 
-MerjTek.MonoGame.OpenVr is a library that works on WIndows to add OpenVR (SteamVR) abilities to a MonoGame project.
+MerjTek.MonoGame.OpenVr is a library that works on Windows to add OpenVR (SteamVR) abilities to a MonoGame project.
 
 
 ## Help Needed
@@ -10,8 +10,8 @@ MerjTek.MonoGame.OpenVr is a library that works on WIndows to add OpenVR (SteamV
 
 
 ## Nuget Packages
--[ MerjTek.MonoGame.OpenVr.DirectX ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.DirectX) v1.0.1  
--[ MerjTek.MonoGame.OpenVr.OpenGL ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.OpenGL) v1.0.1  
+-[ MerjTek.MonoGame.OpenVr.DirectX ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.DirectX) v1.0.2  
+-[ MerjTek.MonoGame.OpenVr.OpenGL ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.OpenGL) v1.0.2  
 
 
 ## How To Use
@@ -55,10 +55,8 @@ __After Installing the Nuget Package:__
 
             base.Draw(gameTime);
             
-            // OPTIONAL: Render the left eye to the screen
-            _spriteBatch.Begin();
-            _spriteBatch.Draw(LeftEyeTarget, Vector2.Zero, Color.White);
-            _spriteBatch.End();
+            // OPTIONAL:
+            RenderLeftEyeToScreen(_spriteBatch);
         }
         ...
 
@@ -85,8 +83,7 @@ __After Installing the Nuget Package:__
 
 ## Building
 
-* No problems building in Visual Studio 2022.
-* The nuget for OpenGL after building contains a dependency on Monogame.Framework.WindowsDX. I have to use the .nupkg editing tool to correct the dependency to Monogame.Framework.OpenGL.
+* No problems building in Visual Studio 2026.
 
 
 ## License
