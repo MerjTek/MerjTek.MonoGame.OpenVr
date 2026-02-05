@@ -9,12 +9,21 @@ MerjTek.MonoGame.OpenVr is a library that works on Windows to add OpenVR (SteamV
 * Finish getting the correct position and rotation information for the OVRController.
 
 
-## Nuget Packages
+## Template Nuget Packages
+-[ MerjTek.MonoGame.OpenVr.Templates.CSharp ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.Templates.CSharp) v1.0.2  
+
+
+## Individual Nuget Packages
 -[ MerjTek.MonoGame.OpenVr.DirectX ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.DirectX) v1.0.2  
 -[ MerjTek.MonoGame.OpenVr.OpenGL ](https://www.nuget.org/packages/MerjTek.MonoGame.OpenVr.OpenGL) v1.0.2  
 
 
-## How To Use
+## How To Use (Template Package)
+__After Installing the Nuget Package:__
+![Create New Project Image](https://github.com/MerjTek/MerjTek.MonoGame.OpenVr/blob/main/Images/Create_New_Project.png)
+
+
+## How To Use (Individual Nuget Packages only)
 __After Installing the Nuget Package:__
 
         ...
@@ -74,11 +83,6 @@ __After Installing the Nuget Package:__
             // NOTE: Implement scene drawing code here
         }
         ...
-
-
-## Caveats
-
-* Make sure you are using the HiDef profile for DirectX. OpenGL can use both the Reach and the HiDef profiles.
 
 
 ## Building
