@@ -3,8 +3,11 @@
   <PropertyGroup>
     <PackageType>Template</PackageType>
     <PackageVersion>1.0.2</PackageVersion>
-    <PackageId>MerjTek.MonoGame.OpenVR.Templates</PackageId>
-    <Title>MerjTek MonoGame OpenVR (SteamVR) Templates</Title>
+    <PackageId>MerjTek.MonoGame.OpenVR.Templates.CSharp</PackageId>
+    <PackageTags>MonoGame;VR</PackageTags>
+	<Title>MerjTek MonoGame OpenVR (SteamVR) Templates</Title>
+    <Copyright>MerjTek © 2025</Copyright>
+    <Company>MerjTek</Company>
     <Authors>MerjTek</Authors>
     <Description>Templates to quickly create C# game projects powered by MonoGame and OpenVR (SteamVR).</Description>
     <PackageTags>dotnet-new;templates;contoso</PackageTags>
@@ -13,11 +16,14 @@
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>content</ContentTargetFolders>
+    <PackageProjectUrl>https://github.com/MerjTek/MerjTek.MonoGame.OpenVr</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MerjTek/MerjTek.MonoGame.OpenVr</RepositoryUrl>
+    <PackageReleaseNotes>1.0.2 - Initial Release</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
     <Compile Remove="**\*" />
   </ItemGroup>
-
-</Project>
+ 
+ </Project>
